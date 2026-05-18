@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Quiz de Idiomas</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#b9fff1,#c9e8ff);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.container{
+    width:100%;
+    max-width:750px;
+    background:white;
+    border-radius:20px;
+    padding:30px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.15);
+}
+
+h1{
+    text-align:center;
+    color:#008b8b;
+    margin-bottom:20px;
+}
+
+.top-info{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:20px;
+    font-weight:bold;
+    color:#006666;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.language-select{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:20px;
+}
+
+button{
+    border:none;
+    padding:12px 18px;
+    border-radius:12px;
+    cursor:pointer;
+    transition:0.3s;
+    font-size:16px;
+}
+
+.lang-btn{
+    background:#7de3d6;
+    color:#004f4f;
+    font-weight:bold;
+}
+
+.lang-btn:hover{
+    background:#63cec1;
+}
+
+.question{
+    font-size:24px;
+    color:#0a5d73;
+    margin-bottom:20px;
+}
+
+.answers{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.answer-btn{
+    background:#d7f7ff;
+    color:#004f4f;
+    text-align:left;
+}
+
+.answer-btn:hover{
+    background:#bdefff;
+}
+
+.correct{
+    background:#94ffae !important;
+}
+
+.wrong{
+    background:#ff9c9c !important;
+}
+
+.next-btn{
+    margin-top:20px;
+    width:100%;
+    background:#5ed3ff;
+    color:white;
+    font-weight:bold;
+}
+
+.next-btn:hover{
+    background:#36c5f5;
+}
+
+.center{
+    text-align:center;
+}
+
+.reward{
+    color:#008b8b;
+    font-size:24px;
+    margin-top:20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🌎 Quiz de Idiomas</h1>
+
+    <div class="top-info">
+        <div>⭐ Nível: <span id="levelText">Fácil</span></div>
+        <div>🪙 Moedas: <span id="coins">0</span></div>
+    </div>
+
+    <div id="home">
+
+        <div class="language-select">
+            <button class="lang-btn" onclick="startQuiz('portugues')">Português</button>
+            <button class="lang-btn" onclick="startQuiz('ingles')">Inglês</button>
+            <button class="lang-btn" onclick="startQuiz('alemao')">Alemão</button>
+        </div>
+
+    </div>
+
+    <div id="quiz"></div>
+
+</div>
+
+<script>
+
+const baseQuestions = {
+
+    portugues: [
+        {question:"Plural de cão?",answers:["Cãos","Cães","Canes","Cãozes"],correct:1},
+        {question:"Qual é verbo?",answers:["Mesa","Bonito","Correr","Azul"],correct:2},
+        {question:"Qual é adjetivo?",answers:["Livro","Feliz","Cidade","Comer"],correct:1},
+        {question:"Qual está correta?",answers:["Excessão","Exceção","Escessão","Exsesão"],correct:1},
+        {question:"Feminino de ator?",answers:["Atriona","Atrisa","Atriz","Atora"],correct:2},
+        {question:"Qual é vogal?",answers:["B","D","A","T"],correct:2},
+        {question:"Qual é substantivo?",answers:["Cidade","Correr","Azul","Rápido"],correct:0},
+        {question:"Qual possui acento?",answers:["Cafe","Arvore","Livro","Árvore"],correct:3},
+        {question:"Contrário de alto?",answers:["Grande","Baixo","Forte","Magro"],correct:1},
+        {question:"Pontuação de pergunta?",answers:[".","!","?",";"],correct:2}
+    ],
+
+    ingles: [
+        {question:"Gato em inglês?",answers:["Dog","Cat","Fish","Bird"],correct:1},
+        {question:"Hello significa?",answers:["Olá","Tchau","Noite","Obrigado"],correct:0},
+        {question:"Blue é?",answers:["Azul","Verde","Branco","Amarelo"],correct:0},
+        {question:"Obrigado em inglês?",answers:["Please","Thanks","Sorry","Bye"],correct:1},
+        {question:"Dog significa?",answers:["Gato","Peixe","Cachorro","Pássaro"],correct:2},
+        {question:"Water significa?",answers:["Leite","Água","Café","Suco"],correct:1},
+        {question:"Five é?",answers:["2","4","5","7"],correct:2},
+        {question:"Book significa?",answers:["Caneta","Mesa","Livro","Escola"],correct:2},
+        {question:"Bom dia?",answers:["Good night","Goodbye","Good morning","Hello"],correct:2},
+        {question:"Food significa?",answers:["Comida","Porta","Janela","Rua"],correct:0}
+    ],
+
+    alemao: [
+        {question:"Olá em alemão?",answers:["Danke","Hallo","Bitte","Haus"],correct:1},
+        {question:"Danke significa?",answers:["Obrigado","Casa","Livro","Água"],correct:0},
+        {question:"Haus significa?",answers:["Carro","Casa","Mesa","Janela"],correct:1},
+        {question:"Katze significa?",answers:["Cachorro","Livro","Gato","Comida"],correct:2},
+        {question:"Wasser significa?",answers:["Água","Leite","Café","Pão"],correct:0},
+        {question:"Buch significa?",answers:["Caneta","Livro","Casa","Porta"],correct:1},
+        {question:"Tschüss significa?",answers:["Olá","Boa noite","Tchau","Obrigado"],correct:2},
+        {question:"Auto significa?",answers:["Livro","Carro","Cachorro","Janela"],correct:1},
+        {question:"Guten Morgen significa?",answers:["Boa tarde","Boa noite","Bom dia","Tchau"],correct:2},
+        {question:"Hund significa?",answers:["Gato","Cachorro","Pássaro","Peixe"],correct:1}
+    ]
+};
+
+let currentQuiz = [];
+let currentQuestion = 0;
+let score = 0;
+let coins = 0;
+
+let level = "Fácil";
+
+const quizDiv = document.getElementById("quiz");
+const levelText = document.getElementById("levelText");
+const coinsText = document.getElementById("coins");
+
+function startQuiz(language){
+
+    currentQuiz = [...baseQuestions[language]];
+
+    if(level === "Médio"){
+        currentQuiz.sort(() => Math.random() - 0.5);
+    }
+
+    if(level === "Difícil"){
+        currentQuiz.sort(() => Math.random() - 0.5);
+
+        currentQuiz.forEach(q => {
+            q.answers.sort(() => Math.random() - 0.5);
+        });
+    }
+
+    currentQuestion = 0;
+    score = 0;
+
+    showQuestion();
+}
+
+function showQuestion(){
+
+    const q = currentQuiz[currentQuestion];
+
+    quizDiv.innerHTML = `
+        <div class="question">
+            ${currentQuestion + 1}. ${q.question}
+        </div>
+
+        <div class="answers">
+            ${q.answers.map((ans,index)=>
+                `<button class="answer-btn" onclick="checkAnswer(${index})">
+                    ${ans}
+                </button>`
+            ).join("")}
+        </div>
+    `;
+}
+
+function checkAnswer(selected){
+
+    const q = currentQuiz[currentQuestion];
+
+    const buttons = document.querySelectorAll(".answer-btn");
+
+    buttons.forEach((btn,index)=>{
+
+        btn.disabled = true;
+
+        if(index === q.correct){
+            btn.classList.add("correct");
+        }
+
+        if(index === selected && index !== q.correct){
+            btn.classList.add("wrong");
+        }
+
+    });
+
+    if(selected === q.correct){
+        score++;
+    }
+
+    quizDiv.innerHTML += `
+        <button class="next-btn" onclick="nextQuestion()">
+            Próxima
+        </button>
+    `;
+}
+
+function nextQuestion(){
+
+    currentQuestion++;
+
+    if(currentQuestion < currentQuiz.length){
+        showQuestion();
+    } else {
+        finishQuiz();
+    }
+
+}
+
+function finishQuiz(){
+
+    let passed = false;
+    let reward = 0;
+
+    if(level === "Fácil" && score >= 7){
+        passed = true;
+        reward = 10;
+        level = "Médio";
+    }
+
+    else if(level === "Médio" && score >= 8){
+        passed = true;
+        reward = 40;
+        level = "Difícil";
+    }
+
+    else if(level === "Difícil" && score >= 9){
+        passed = true;
+        reward = 150;
+    }
+
+    coins += reward;
+
+    levelText.innerText = level;
+    coinsText.innerText = coins;
+
+    if(level === "Difícil" && score >= 9){
+
+        quizDiv.innerHTML = `
+            <div class="center">
+                <h2>🏆 PARABÉNS!</h2>
+                <div class="reward">
+                    Você completou todos os níveis!<br><br>
+                    +150 moedas 🪙
+                </div>
+
+                <button class="next-btn" onclick="resetGame()">
+                    Voltar ao Início
+                </button>
+            </div>
+        `;
+
+        return;
+    }
+
+    if(passed){
+
+        quizDiv.innerHTML = `
+            <div class="center">
+                <h2>🎉 Você passou!</h2>
+
+                <div class="reward">
+                    +${reward} moedas 🪙
+                </div>
+
+                <p style="margin-top:15px;">
+                    Novo nível: <b>${level}</b>
+                </p>
+
+                <button class="next-btn" onclick="clearQuiz()">
+                    Continuar
+                </button>
+            </div>
+        `;
+    }
+
+    else{
+
+        quizDiv.innerHTML = `
+            <div class="center">
+                <h2>❌ Você não passou!</h2>
+
+                <p style="margin-top:15px;">
+                    Acertos: ${score}/10
+                </p>
+
+                <button class="next-btn" onclick="clearQuiz()">
+                    Tentar Novamente
+                </button>
+            </div>
+        `;
+    }
+
+}
+
+function clearQuiz(){
+    quizDiv.innerHTML = "";
+}
+
+function resetGame(){
+
+    level = "Fácil";
+    coins = 0;
+
+    levelText.innerText = level;
+    coinsText.innerText = coins;
+
+    quizDiv.innerHTML = "";
+}
+
+</script>
+
+</body>
+</html>
